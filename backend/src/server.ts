@@ -29,6 +29,10 @@ interface Message {
   timestamp: number;
 }
 
+app.get('/health', (req: Request, res: Response) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 
 app.listen(PORT, () => {
   console.log('Server started');
