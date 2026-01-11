@@ -91,6 +91,68 @@ async function fetchWeather(
   }
 }
 
+// Gemini AI Handler with retry logic
+async function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function callGeminiAPI(prompt: string, systemInstruction?: string, jsonMode: boolean = false, retries: number = 3) {
+  let lastError;
+
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      // Add exponential backoff delay for retries
+      if (attempt > 0) {
+        const delayMs = Math.min(1000 * Math.pow(2, attempt), 5000);
+        await sleep(delayMs);
+      }
+
+      const body: any = {
+        contents: [{ parts: [{ text: prompt }] }]
+      };
+
+      if (systemInstruction) {
+        body.systemInstruction = { parts: [{ text: systemInstruction }] };
+      }
+
+      if (jsonMode) {
+        body.generationConfig = { responseMimeType: "application/json" };
+      }
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        }
+      );
+
+      if (!response.ok) {
+        // If rate limited (429), retry
+        if (response.status === 429 && attempt < retries - 1) {
+          console.log(`Rate limited, retrying in ${1000 * Math.pow(2, attempt + 1)}ms...`);
+          lastError = new Error(`Gemini API Error: ${response.status}`);
+          continue;
+        }
+        throw new Error(`Gemini API Error: ${response.status}`);
+      }
+
+      const data = await response.json() as any;
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
+    } catch (error) {
+      lastError = error;
+      if (attempt < retries - 1) {
+        console.log(`Gemini API attempt ${attempt + 1} failed, retrying...`);
+        continue;
+      }
+      console.error("Gemini API call failed after all retries", error);
+      throw error;
+    }
+  }
+
+  throw lastError;
+}
 
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
