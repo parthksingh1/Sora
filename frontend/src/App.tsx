@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
 
+const THEMES = {
+  dark: {
+    bg: 'bg-slate-900',
+    text: 'text-white'
+  },
+  light: {
+    bg: 'bg-white',
+    text: 'text-slate-900'
+  }
+};
+
+
 type Language = 'en' | 'ja';
 type Theme = 'dark' | 'light';
 
@@ -25,8 +37,9 @@ export default function App() {
   const [theme] = useState<Theme>('dark');
 
   return (
-    <div>
-      SORA
-    </div>
-  );
+  <div className={`${THEMES[theme].bg} ${THEMES[theme].text} min-h-screen`}>
+    SORA
+  </div>
+);
+
 }
