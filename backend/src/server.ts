@@ -339,6 +339,18 @@ app.post('/api/translate-suggestions', async (req: Request, res: Response) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log('Server started');
+// Error handling middleware
+app.use((err: Error, req: Request, res: Response, next: any) => {
+  console.error('Server error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Sora backend server running on port ${PORT}`);
+  console.log(`📍 API endpoints available at http://localhost:${PORT}/api`);
+  console.log(`🔑 Gemini API Key configured: ${GEMINI_API_KEY ? 'Yes' : 'No'}`);
+  console.log(`🌤️  Weather API Key configured: ${WEATHER_API_KEY ? 'Yes' : 'No'}`);
+});
+
+export default app;
