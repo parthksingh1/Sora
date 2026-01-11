@@ -1,0 +1,10 @@
+{
+  "name": "sora-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Sora AI Assistant",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "node dist/server.js"
+  },
+  "license": "MIT"
+}
