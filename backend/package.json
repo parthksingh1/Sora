@@ -1,7 +1,7 @@
 {
   "name": "sora-backend",
   "version": "1.0.0",
-  "description": "Backend API for Sora AI Assistant",
+  "private": true,
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
