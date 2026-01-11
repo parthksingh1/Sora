@@ -6,10 +6,6 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
 
 // Configuration
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
@@ -360,11 +356,11 @@ app.use((err: Error, req: Request, res: Response, next: any) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 Sora backend server running on port ${PORT}`);
-  console.log(`📍 API endpoints available at http://localhost:${PORT}/api`);
+  console.log(`📍 Health check: /health`);
   console.log(`🔑 Gemini API Key configured: ${GEMINI_API_KEY ? 'Yes' : 'No'}`);
-  console.log(`🌤️  Weather API Key configured: ${WEATHER_API_KEY ? 'Yes' : 'No'}`);
+  console.log(`🌤️ Weather API Key configured: ${WEATHER_API_KEY ? 'Yes' : 'No'}`);
 });
 
-export default app;
+export default server;
