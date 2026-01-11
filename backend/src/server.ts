@@ -267,6 +267,78 @@ app.post('/api/chat', async (req: Request, res: Response) => {
   }
 });
 
+// Translation endpoint
+app.post('/api/translate', async (req: Request, res: Response) => {
+  try {
+    const { messages, targetLanguage } = req.body;
+
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Messages array is required' });
+    }
+
+    if (!targetLanguage) {
+      return res.status(400).json({ error: 'Target language is required' });
+    }
+
+    const targetLangName = targetLanguage === 'en' ? 'English' : 'Japanese';
+
+    const prompt = `
+      Translate the following JSON array of message texts to ${targetLangName}.
+      Return ONLY a raw JSON object where keys are message IDs and values are translated strings.
+      Input: ${JSON.stringify(messages)}
+    `;
+
+    const translationResult = await callGeminiAPI(prompt, undefined, true);
+
+    if (!translationResult) {
+      return res.status(500).json({ error: 'Translation failed' });
+    }
+
+    const translations = JSON.parse(translationResult);
+    res.json(translations);
+  } catch (error: any) {
+    console.error('Translation API error:', error);
+    res.status(500).json({ error: error.message || 'Translation failed' });
+  }
+});
+
+// Translate suggestions endpoint
+app.post('/api/translate-suggestions', async (req: Request, res: Response) => {
+  try {
+    const { suggestions, targetLanguage } = req.body;
+
+    if (!suggestions || !Array.isArray(suggestions)) {
+      return res.status(400).json({ error: 'Suggestions array is required' });
+    }
+
+    if (!targetLanguage) {
+      return res.status(400).json({ error: 'Target language is required' });
+    }
+
+    const targetLangName = targetLanguage === 'en' ? 'English' : 'Japanese';
+
+    const prompt = `
+      Translate the following suggestion phrases to ${targetLangName}.
+      Keep them short and conversational (2-5 words each).
+      Maintain the friendly, casual tone.
+      Return ONLY a JSON array of translated strings in the same order.
+      Input: ${JSON.stringify(suggestions)}
+    `;
+
+    const translationResult = await callGeminiAPI(prompt, undefined, true);
+
+    if (!translationResult) {
+      return res.status(500).json({ error: 'Translation failed' });
+    }
+
+    const translated = JSON.parse(translationResult);
+    res.json({ translated });
+  } catch (error: any) {
+    console.error('Suggestion translation API error:', error);
+    res.status(500).json({ error: error.message || 'Suggestion translation failed' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log('Server started');
 });
