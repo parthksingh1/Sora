@@ -169,7 +169,7 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // Weather endpoint
-app.post('/api/weather', async (req: Request, res: Response) => {
+app.post('/weather', async (req: Request, res: Response) => {
   try {
     const { query, lang = 'en' } = req.body;
 
@@ -186,7 +186,7 @@ app.post('/api/weather', async (req: Request, res: Response) => {
 });
 
 // Extract city from query
-app.post('/api/extract-city', async (req: Request, res: Response) => {
+app.post('/extract-city', async (req: Request, res: Response) => {
   try {
     const { query } = req.body;
 
@@ -210,7 +210,7 @@ app.post('/api/extract-city', async (req: Request, res: Response) => {
 });
 
 // Chat endpoint
-app.post('/api/chat', async (req: Request, res: Response) => {
+app.post('/chat', async (req: Request, res: Response) => {
   try {
     const { message, weather, history, language } = req.body;
 
@@ -278,7 +278,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
 });
 
 // Translation endpoint
-app.post('/api/translate', async (req: Request, res: Response) => {
+app.post('/translate', async (req: Request, res: Response) => {
   try {
     const { messages, targetLanguage } = req.body;
 
@@ -313,7 +313,7 @@ app.post('/api/translate', async (req: Request, res: Response) => {
 });
 
 // Translate suggestions endpoint
-app.post('/api/translate-suggestions', async (req: Request, res: Response) => {
+app.post('/translate-suggestions', async (req: Request, res: Response) => {
   try {
     const { suggestions, targetLanguage } = req.body;
 
