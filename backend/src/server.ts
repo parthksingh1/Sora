@@ -63,7 +63,7 @@ async function fetchWeather(
     const response = await fetch(url);
     if (!response.ok) throw new Error("Weather API Error");
 
-    const data = await response.json();
+    const data = await response.json() as any;
     const current = data.list[0];
     const isDay = current.sys.pod === 'd';
 
