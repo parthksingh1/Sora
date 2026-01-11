@@ -154,6 +154,10 @@ async function callGeminiAPI(prompt: string, systemInstruction?: string, jsonMod
   throw lastError;
 }
 
+app.post('/api/weather', async (req: Request, res: Response) => {
+});
+
+
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
