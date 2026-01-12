@@ -68,7 +68,7 @@ cp .env.example .env
 4. Edit `.env` and add your API keys:
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
-WEATHER_API_KEY=ea896f5d1889d8566698c36adc91613b
+WEATHER_API_KEY=weather api
 PORT=3000
 NODE_ENV=development
 ```
