@@ -401,6 +401,7 @@ export default function App() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isProcessingVoiceRef = useRef<boolean>(false);
 
   const THEME = THEMES[theme];
 
@@ -637,9 +638,12 @@ export default function App() {
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
 
       silenceTimerRef.current = setTimeout(() => {
-        recognitionRef.current.stop();
-        if (transcript.trim()) {
-          handleSend(transcript);
+        if (recognitionRef.current && !isProcessingVoiceRef.current) {
+          isProcessingVoiceRef.current = true;
+          recognitionRef.current.stop();
+          if (transcript.trim()) {
+            handleSend(transcript);
+          }
         }
       }, 4000);
     };
@@ -666,6 +670,7 @@ export default function App() {
       recognitionRef.current.stop();
       setAppState('idle');
     }
+    isProcessingVoiceRef.current = false;
   };
 
   const cancelSpeech = () => {
@@ -712,6 +717,12 @@ export default function App() {
   const handleSend = async (textOverride?: string) => {
     const textToSend = typeof textOverride === 'string' ? textOverride : input;
 
+    // Prevent duplicate sends from mic
+    if (isProcessingVoiceRef.current) {
+      isProcessingVoiceRef.current = false;
+      return;
+    }
+
     if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     if (recognitionRef.current) recognitionRef.current.stop();
 
@@ -726,7 +737,11 @@ export default function App() {
       text: textToSend,
       timestamp: Date.now()
     };
-    setMessages(prev => [...prev, userMsg]);
+
+    // Create updated history including the new user message
+    const updatedHistory = [...messages, userMsg];
+
+    setMessages(updatedHistory);
     setInput('');
     setCurrentSuggestions([]);
     setAppState('processing');
@@ -747,7 +762,7 @@ export default function App() {
         handleLocateMe();
       }
 
-      const aiResponse = await getAIResponse(textToSend, activeWeather, messages, language);
+      const aiResponse = await getAIResponse(textToSend, activeWeather, updatedHistory, language);
 
       let aiText = aiResponse.text || "I'm having trouble connecting.";
       const foundSuggestions = aiText.match(/~([^~]+)~/g)?.map((s: string) => s.slice(1, -1)) || [];
